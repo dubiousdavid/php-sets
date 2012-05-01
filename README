@@ -1,0 +1,28 @@
+$set1 = new Set("Guy's names");
+$set1->add(array("Pat", "Lauren", "Matt", "Joe", "Billy"));
+
+$set2 = new Set("Girl's names");
+$set2->add(array("Christy", "Pat", "Lauren", "Joe", "Kelly", "Tamara"));
+
+$set3 = new Set("Celebs");
+$set3->add(array("Christy", "Kelly", "Matt", "Joe", "Brad", "Miley"));
+
+$resultSet = $set1->union($set2, $set2);
+
+$resultSet->getLabel();
+$resultSet->get();
+
+$resultSet = $set1->symDiff($set2, $set2);
+
+$resultSet->getLabel();
+$resultSet->get();
+
+$resultSet = $set1->relComp($set2, $set2);
+
+$resultSet->getLabel();
+$resultSet->get();
+
+$resultSet = $set1->intersection($set2, $set2);
+
+$resultSet->getLabel();
+$resultSet->get();
