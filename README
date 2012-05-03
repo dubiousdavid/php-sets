@@ -16,7 +16,7 @@ $set3->add(array("Christy", "Kelly", "Matt", "Joe", "Brad", "Miley"));
 $set4 = new Set("Positive #s", "Rational #s");
 $set4->add(range(1, 10));
 
-# Perform set operations.
+# Perform set operations. All set operations return a 'result' set.
 
 $resultSet = $set1->union($set2, $set3);
 
