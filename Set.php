@@ -4,11 +4,14 @@
 class Set
 {
     protected $label;
-    protected $elements = array();
+    protected $universe;
+    protected $elements    = array();
+    const UNIVERSE_ERROR   = "The set '%s' is in the '%s' universe, but the set '%s' is in the '%s' universe";
     
-    public function __construct($label)
+    public function __construct($label = "undefined", $universe = "undefined")
     {
-        $this->setLabel($label);
+        $this->label    = $label;
+        $this->universe = $universe;
     }
     
     public function setLabel($label)
@@ -23,29 +26,41 @@ class Set
         return $this->label;
     }
     
+    public function setUniverse($universe)
+    {
+        $this->universe = $universe;
+        
+        return $this;
+    }
+    
+    public function getUniverse()
+    {
+        return $this->universe;
+    }
+    
     public function __toString()
     {
         return $this->label;
     }
     
-    //Add element(s)
+    //Add element(s) to this set.  No universe check.
     
     public function add($elements)
     {
         if(is_array($elements))
         {
             foreach($elements as $element){
-                $this->elements[$element] = NULL;
+                $this->elements[(string) $element] = NULL;
             }
         }
         else if(get_class($elements) == __CLASS__)
         {
             foreach($elements->get() as $element){
-                $this->elements[$element] = NULL;
+                $this->elements[(string) $element] = NULL;
             }
         }
         else{
-            $this->elements[$elements] = NULL;
+            $this->elements[(string) $elements] = NULL;
         }
         
         return $this;
@@ -65,34 +80,79 @@ class Set
         return $this->get();
     }
     
-    //Union
+    //Is this set a subset of all the arguments. All sets must be in the same universe.
+    
+    public function isSubset()
+    {
+        $elements = $this->get();
+        
+        foreach(func_get_args() as $arg)
+        {
+            //Check if the sets are in the same universe
+            if(($universe = $arg->getUniverse()) != $this->universe)
+            {
+                throw new Set_Exception(
+                    sprintf(self::UNIVERSE_ERROR, $arg->getLabel(), $universe, $this->label, $this->universe)
+                );
+            }
+            
+            $set = $arg->get();
+            
+            foreach($elements as $element)
+            {
+                if(!in_array($element, $set)){
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    //Union of this set and all arguments. All sets must be in the same universe.
     
     public function union()
     {
         $resultSet = new self();
         $resultSet->add($this->get());
         
-        $labels[] = $this->getLabel();
+        $labels[] = $this->label;
         
         foreach(func_get_args() as $arg)
         {
-            $labels[] = $arg->getLabel() ?: "unlabeled";
+            //Check if the sets are in the same universe
+            if(($universe = $arg->getUniverse()) != $this->universe)
+            {
+                throw new Set_Exception(
+                    sprintf(self::UNIVERSE_ERROR, $arg->getLabel(), $universe, $this->label, $this->universe)
+                );
+            }
+            
+            $labels[] = $arg->getLabel();
             $resultSet->add($arg);            
         }
         
         return $resultSet->setLabel("(Union of ".implode(", ", $labels).")");
     }
     
-    //Intersection
+    //Intersection of this set and all arguments. All sets must be in the same universe.
     
     public function intersection()
     {
         $params[] = $this->get();
-        $labels[] = $this->getLabel();
+        $labels[] = $this->label;
         
         foreach(func_get_args() as $arg)
         {
-            $labels[] = $arg->getLabel() ?: "unlabeled";
+            //Check if the sets are in the same universe
+            if(($universe = $arg->getUniverse()) != $this->universe)
+            {
+                throw new Set_Exception(
+                    sprintf(self::UNIVERSE_ERROR, $arg->getLabel(), $universe, $this->label, $this->universe)
+                );
+            }
+            
+            $labels[] = $arg->getLabel();
             $params[] = $arg->get();
         }
         
@@ -102,7 +162,7 @@ class Set
             ->add(call_user_func_array("array_intersect", $params));
     }
     
-    //Relative complement
+    //Relative complement of this set and all arguments. All sets must be in the same universe.
     
     public function relComp()
     {
@@ -110,28 +170,44 @@ class Set
         
         foreach(func_get_args() as $arg)
         {
-            $labels[] = $arg->getLabel() ?: "unlabeled";
+            //Check if the sets are in the same universe
+            if(($universe = $arg->getUniverse()) != $this->universe)
+            {
+                throw new Set_Exception(
+                    sprintf(self::UNIVERSE_ERROR, $arg->getLabel(), $universe, $this->label, $this->universe)
+                );
+            }
+            
+            $labels[] = $arg->getLabel();
             $params[] = $arg->get();
         }
         
         $resultSet = new self();
         
-        return $resultSet->setLabel("(Relative complement of ".$this->getLabel()." in ".implode(", ", $labels).")")
+        return $resultSet->setLabel("(Relative complement of ".$this->label." in ".implode(", ", $labels).")")
             ->add(call_user_func_array("array_diff", $params));
     }
     
-    //Symetric difference
+    //Symetric difference of this set and all arguments. All sets must be in the same universe.
     
     public function symDiff()
     {
         //All sets
         $sets[] = $this->get();
         
-        $labels[] = $this->getLabel();
+        $labels[] = $this->label;
         
         foreach(func_get_args() as $arg)
         {
-            $labels[]   = $arg->getLabel() ?: "unlabeled";
+            //Check if the sets are in the same universe
+            if(($universe = $arg->getUniverse()) != $this->universe)
+            {
+                throw new Set_Exception(
+                    sprintf(self::UNIVERSE_ERROR, $arg->getLabel(), $universe, $this->label, $this->universe)
+                );
+            }
+            
+            $labels[]   = $arg->getLabel();
             $sets[]     = $arg->get();
         }
         
@@ -161,3 +237,17 @@ class Set
         return $resultSet;
     }
 }
+
+class Set_Exception extends Exception
+{
+	
+}
+
+
+
+
+
+
+
+
+
