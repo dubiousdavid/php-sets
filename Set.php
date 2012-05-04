@@ -40,27 +40,33 @@ class Set
     
     public function __toString()
     {
-        return $this->label;
+        return $this->label." in ".$this->universe;
     }
     
-    //Add element(s) to this set.  No universe check.
+    //Add element(s) to this set. All values are converted to strings. No universe check.
     
     public function add($elements)
     {
+        //Array
         if(is_array($elements))
         {
             foreach($elements as $element){
                 $this->elements[(string) $element] = NULL;
             }
         }
+        //From an existing set
         else if(get_class($elements) == __CLASS__)
         {
             foreach($elements->get() as $element){
                 $this->elements[(string) $element] = NULL;
             }
         }
-        else{
-            $this->elements[(string) $elements] = NULL;
+        //Individual arguments
+        else
+        {
+            foreach(func_get_args() as $element){
+                $this->elements[(string) $element] = NULL;
+            }
         }
         
         return $this;
@@ -101,6 +107,35 @@ class Set
             foreach($elements as $element)
             {
                 if(!in_array($element, $set)){
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    //Is this set a superset of all the arguments. All sets must be in the same universe.
+    
+    public function isSuperset()
+    {
+        $elements = $this->get();
+        
+        foreach(func_get_args() as $arg)
+        {
+            //Check if the sets are in the same universe
+            if(($universe = $arg->getUniverse()) != $this->universe)
+            {
+                throw new Set_Exception(
+                    sprintf(self::UNIVERSE_ERROR, $arg->getLabel(), $universe, $this->label, $this->universe)
+                );
+            }
+            
+            $set = $arg->get();
+            
+            foreach($set as $element)
+            {
+                if(!in_array($element, $elements)){
                     return false;
                 }
             }

@@ -11,10 +11,13 @@ $set2 = new Set("Girl's names", "People");
 $set2->add(array("Christy", "Pat", "Lauren", "Joe", "Kelly", "Tamara"));
 
 $set3 = new Set("Celebs", "People");
-$set3->add(array("Christy", "Kelly", "Matt", "Joe", "Brad", "Miley"));
+$set3->add("Christy", "Kelly", "Matt", "Joe", "Brad", "Miley");
 
 $set4 = new Set("Positive #s", "Rational #s");
 $set4->add(range(1, 10));
+
+$set5 = new Set("Copy", "Rational #s");
+$set5->add($set4)->add(11, 12, 13, 14, 15);
 
 # Perform set operations. All set operations return a 'result' set.
 
@@ -38,9 +41,31 @@ $resultSet = $set1->intersection($set2, $set3);
 echo $resultSet->getLabel();
 var_dump($resultSet->get());
 
+echo $set4->isSubset($set5);
+echo $set5->isSuperset($set4);
+
 # The following will throw a 'Set_Exception' exception because the two sets do not belong to the same universe
 
 $resultSet = $set1->union($set4);
 
 echo $resultSet->getLabel();
 var_dump($resultSet->get());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
