@@ -18,7 +18,7 @@ $set4->add(range(1, 10));
 $set5 = new Set("Copy", "Rational #s");
 $set5->add($set4)->add(11, 12, 13, 14, 15);
 
-# Perform set operations. All set operations return a 'result' set.
+# Perform set operations. All set operations return a 'result' set except isSubset() and isSuperset().
 
 $resultSet = $set1->union($set2, $set3);
 
@@ -46,9 +46,6 @@ echo $set5->isSuperset($set4);
 # The following will throw a 'Set_Exception' exception because the two sets do not belong to the same universe
 
 $resultSet = $set1->union($set4);
-
-echo $resultSet->getLabel();
-var_dump($resultSet->get());
 
 
 
