@@ -167,7 +167,7 @@ class Set
             $resultSet->add($arg);            
         }
         
-        return $resultSet->setLabel("(Union of ".implode(", ", $labels).")");
+        return $resultSet->setLabel("(Union of ".implode(", ", $labels).")")->setUniverse($this->universe);
     }
     
     //Intersection of this set and all arguments. All sets must be in the same universe.
@@ -193,7 +193,7 @@ class Set
         
         $resultSet = new self();
         
-        return $resultSet->setLabel("(Intersection of ".implode(", ", $labels).")")
+        return $resultSet->setLabel("(Intersection of ".implode(", ", $labels).")")->setUniverse($this->universe)
             ->add(call_user_func_array("array_intersect", $params));
     }
     
@@ -220,6 +220,7 @@ class Set
         $resultSet = new self();
         
         return $resultSet->setLabel("(Relative complement of ".$this->label." in ".implode(", ", $labels).")")
+            ->setUniverse($this->universe)
             ->add(call_user_func_array("array_diff", $params));
     }
     
@@ -263,7 +264,8 @@ class Set
         
         //Calculate difference
         $resultSet = new self();
-        $resultSet->setLabel("(Symetric difference of ".implode(", ", $labels).")");
+        $resultSet->setLabel("(Symetric difference of ".implode(", ", $labels).")")
+            ->setUniverse($this->universe);
         
         foreach($matrix as $row){
             $resultSet->add(call_user_func_array("array_diff", $row));
