@@ -37,7 +37,7 @@ var_dump($resultSet->get());
 
 $resultSet = $set1->intersection($set2, $set3);
 
-echo $resultSet->getLabel();
+echo $resultSet;
 var_dump($resultSet->get());
 
 echo $set4->isSubset($set5);
